@@ -63,14 +63,29 @@ function Dashboard() {
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>Dashboard</h1>
+        <div className="dashboard-title">
+          <h1>CE<sup>2</sup></h1>
+          <span className="dashboard-subtitle">Cloud Efficiency Explorer</span>
+        </div>
         <button className="logout-button" onClick={handleLogout}>Logout</button>
       </header>
       <main className="dashboard-content">
         {error && <p className="error-message">{error}</p>}
         {accountDetails && (
           <div className="account-details">
-            <h2>{accountDetails.account_id} &gt; {accountDetails.project_name}</h2>
+            <div className="account-info">
+              <div className="account-row">
+                <div className="account-column">
+                  <small>Account ID</small>
+                  <span>{accountDetails.account_id}</span>
+                </div>
+                <span className="separator">&gt;</span>
+                <div className="account-column">
+                  <small>Project Name</small>
+                  <span>{accountDetails.project_name}</span>
+                </div>
+              </div>
+            </div>
             <div className="region-selector">
               <button onClick={toggleDropdown} className="region-dropdown-toggle">
                 Select Regions ({selectedRegions.length})
