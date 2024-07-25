@@ -31,7 +31,7 @@ const ResourceCard = ({ resource }) => {
       <h4>{resource.id || resource.instance_id || resource.db_instance_identifier || resource.volume_id}</h4>
       <p>Type: {resource.instance_type || resource.db_instance_class || `EBS ${resource.size}GB`}</p>
       <p>Region: {resource.region}</p>
-      <p>Potential Cost Savings: ${resource.potential_cost_savings.toFixed(2)}</p>
+      <p>Potential Cost Savings: <span className="cost-savings">${resource.potential_cost_savings.toFixed(2)}</span></p>
 
       {isPopupOpen && (
         <div className="popup-overlay">
@@ -82,9 +82,31 @@ const FilterSection = ({ title, filters, selectedFilters, onChange, initialDispl
   );
 };
 
+const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }) => {
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  return (
+    <div className="pagination">
+      <button 
+        onClick={() => onPageChange(currentPage - 1)} 
+        disabled={currentPage === 1}
+      >
+        Previous
+      </button>
+      <span>{`Page ${currentPage} of ${totalPages}`}</span>
+      <button 
+        onClick={() => onPageChange(currentPage + 1)} 
+        disabled={currentPage === totalPages}
+      >
+        Next
+      </button>
+    </div>
+  );
+};
+
 const ResourceDetails = ({ selectedRegions }) => {
   const [allData, setAllData] = useState(null);
-  const [activeTab, setActiveTab] = useState('ec2_instances');
+  const [activeTab, setActiveTab] = useState('all_resources');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -93,6 +115,8 @@ const ResourceDetails = ({ selectedRegions }) => {
     statuses: [],
     costSavings: { min: '', max: '' }
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const cardsPerPage = 4;
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -122,7 +146,7 @@ const ResourceDetails = ({ selectedRegions }) => {
     const isGlobalSelected = selectedRegions.includes('Global');
 
     return Object.keys(allData).reduce((acc, key) => {
-      acc[key] = allData[key].filter(resource => 
+      const filteredResources = allData[key].filter(resource => 
         (isGlobalSelected || selectedRegions.includes(resource.region)) &&
         (filters.instanceTypes.length === 0 || filters.instanceTypes.includes(resource.instance_type)) &&
         (filters.statuses.length === 0 || filters.statuses.includes(resource.status)) &&
@@ -134,12 +158,20 @@ const ResourceDetails = ({ selectedRegions }) => {
         (filters.costSavings.min === '' || resource.potential_cost_savings >= parseFloat(filters.costSavings.min)) &&
         (filters.costSavings.max === '' || resource.potential_cost_savings <= parseFloat(filters.costSavings.max))
       );
+      
+      acc[key] = filteredResources;
+      
+      if (key !== 'all_resources') {
+        if (!acc.all_resources) acc.all_resources = [];
+        acc.all_resources = [...acc.all_resources, ...filteredResources];
+      }
+      
       return acc;
     }, {});
   }, [allData, selectedRegions, filters]);
 
   const availableFilters = useMemo(() => {
-    if (!allData || !allData[activeTab]) return {};
+    if (!allData) return {};
 
     const isGlobalSelected = selectedRegions.includes('Global');
     
@@ -149,7 +181,11 @@ const ResourceDetails = ({ selectedRegions }) => {
       statuses: new Set()
     };
 
-    allData[activeTab].forEach(resource => {
+    const resourcesToConsider = activeTab === 'all_resources' 
+      ? Object.values(allData).flat() 
+      : allData[activeTab] || [];
+
+    resourcesToConsider.forEach(resource => {
       if (isGlobalSelected || selectedRegions.includes(resource.region)) {
         if (resource.instance_type) filters.instanceTypes.add(resource.instance_type);
         if (resource.status) filters.statuses.add(resource.status);
@@ -173,6 +209,7 @@ const ResourceDetails = ({ selectedRegions }) => {
         ? prevFilters[filterType].filter(item => item !== value)
         : [...prevFilters[filterType], value]
     }));
+    setCurrentPage(1);
   };
 
   const handleCostSavingsChange = (type, value) => {
@@ -183,6 +220,7 @@ const ResourceDetails = ({ selectedRegions }) => {
         [type]: value
       }
     }));
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -193,7 +231,26 @@ const ResourceDetails = ({ selectedRegions }) => {
       statuses: [],
       costSavings: { min: '', max: '' }
     });
+    setCurrentPage(1);
   }, [activeTab, selectedRegions]);
+
+  const paginateData = (data, page, perPage) => {
+    const startIndex = (page - 1) * perPage;
+    return data.slice(startIndex, startIndex + perPage);
+  };
+
+  const renderResourceCards = () => {
+    if (!filteredData || !filteredData[activeTab]) {
+      return <p>No resources found.</p>;
+    }
+
+    const resources = filteredData[activeTab];
+    const paginatedResources = paginateData(resources, currentPage, cardsPerPage);
+
+    return paginatedResources.map((resource, index) => (
+      <ResourceCard key={index} resource={resource} />
+    ));
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -204,6 +261,7 @@ const ResourceDetails = ({ selectedRegions }) => {
   }
 
   const tabs = [
+    { key: 'all_resources', label: 'All Resources' },
     { key: 'ec2_instances', label: 'EC2 Instances' },
     { key: 'rds_instances', label: 'RDS Instances' },
     { key: 'ebs_volumes', label: 'EBS Volumes' },
@@ -220,22 +278,31 @@ const ResourceDetails = ({ selectedRegions }) => {
             <button
               key={tab.key}
               className={`tab ${activeTab === tab.key ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => {
+                setActiveTab(tab.key);
+                setCurrentPage(1);
+              }}
             >
               {tab.label}
             </button>
           ))}
         </div>
-        <div className="tab-content">
-          {filteredData && filteredData[activeTab] && filteredData[activeTab].length > 0 ? (
-            filteredData[activeTab].map((resource, index) => (
-              <ResourceCard key={index} resource={resource} />
-            ))
-          ) : (
-            <p>No resources found.</p>
+        <div className="scrollable-content">
+          <div className="tab-content">
+            {renderResourceCards()}
+          </div>
+        </div>
+        <div className="pagination-container">
+          {filteredData && filteredData[activeTab] && (
+            <Pagination
+              totalItems={filteredData[activeTab].length}
+              itemsPerPage={cardsPerPage}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+            />
           )}
         </div>
-      </div>
+    </div>
       <div className="filter-module">
         <h3>Filters</h3>
         <div className="filter-section">

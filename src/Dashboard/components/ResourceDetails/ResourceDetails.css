@@ -1,17 +1,22 @@
 .resource-details-container {
   display: flex;
-  margin-top: 30px;
+  height: 600px;
+  overflow: hidden;
 }
 
 .resource-details {
-  flex: 3;
-  margin-right: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .filter-module {
-  flex: 1;
-  background-color: #f8f9fa;
+  width: 300px;
+  overflow-y: auto;
   padding: 20px;
+  border-left: 1px solid #ccc;
+  background-color: #f8f9fa;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -34,11 +39,22 @@
 }
 
 .tabs {
+  flex-shrink: 0;
   display: flex;
   overflow-x: auto;
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 1px solid #e0e0e0;
+}
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+.pagination-container {
+  flex-shrink: 0;
+  padding: 10px;
+  border-top: 1px solid #ccc;
 }
 
 .tab {
@@ -191,4 +207,26 @@
 
 .load-more-btn:hover {
   color: #0056b3;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.cost-savings {
+  color: red;
+  font-weight: bold;
 }

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAccountDetails, getResourcesPerRegion } from '../api';
 import ResourceDetails from './components/ResourceDetails/ResourceDetails';
+import GlobalResources from './components/GlobalResources/GlobalResources';
+import CostExplorer from './components/CostExplorer/CostExplorer';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -106,8 +108,13 @@ function Dashboard() {
             ))}
           </div>
         </div>
+        <CostExplorer />
         <ResourceDetails selectedRegions={selectedRegions} />
+        <GlobalResources isGlobalSelected={selectedRegions.includes('Global')} />
       </main>
+      <footer className="dashboard-footer">
+        <p>#resource-revivers</p>
+      </footer>
     </div>
   );
 }
