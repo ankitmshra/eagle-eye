@@ -40,17 +40,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.account-details {
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.account-details h2 {
-  font-size: 1.2rem;
-  color: #1a73e8;
-}
-
 .dashboard-content h3 {
   font-size: 1rem;
   color: rgb(32, 56, 230);
@@ -66,4 +55,83 @@
 .error-message {
   color: #d93025;
   margin-bottom: 15px;
+}
+
+.account-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.account-details h2 {
+  font-size: 1.2rem;
+  color: #1a73e8;
+  margin: 0;
+}
+
+.region-selector {
+  position: relative;
+}
+
+.selected-regions-box {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.selected-regions-box h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #333;
+}
+
+.region-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.region-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: #e1f5fe;
+  color: #0277bd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* Existing styles... */
+
+.region-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  width: 200px; /* Added fixed width */
+}
+
+.region-dropdown label {
+  display: block;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.region-dropdown label:hover {
+  background-color: #f0f0f0;
+}
+
+.region-dropdown input[type="checkbox"] {
+  margin-right: 8px;
 }
