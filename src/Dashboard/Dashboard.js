@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAccountDetails, getResourcesPerRegion } from '../api';
+import ResourceDetails from './components/ResourceDetails/ResourceDetails';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -105,6 +106,7 @@ function Dashboard() {
             ))}
           </div>
         </div>
+        <ResourceDetails selectedRegions={selectedRegions} />
       </main>
     </div>
   );

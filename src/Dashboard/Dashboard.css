@@ -135,3 +135,34 @@
 .region-dropdown input[type="checkbox"] {
   margin-right: 8px;
 }
+
+.region-selector {
+  position: relative;
+}
+
+.region-dropdown-toggle {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+}
+
+.region-dropdown-toggle:hover {
+  border-color: #888;
+}
+
+.cost-savings-filter {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.cost-savings-filter input {
+  width: 80px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
