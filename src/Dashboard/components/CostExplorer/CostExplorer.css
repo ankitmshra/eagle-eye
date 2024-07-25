@@ -3,6 +3,7 @@
     padding: 20px;
     background-color: #f5f5f5;
     border-radius: 5px;
+    border-bottom: 1px solid #ccc;
     position: relative;
     padding-bottom: 30px; /* Make space for the last-updated info */
   }
